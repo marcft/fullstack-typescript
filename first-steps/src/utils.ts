@@ -19,7 +19,7 @@ export const isArgsLengthAtLeast = (minLength: number, args: string[]) => {
 };
 
 export const parseToNumbers = (array: string[]): number[] => {
-  const res: number[] = array.reduce((acc, cur, index) => {
+  const res: number[] = array.reduce((acc: number[], cur, index) => {
     const number = Number(cur);
     if (isNaN(number))
       throw new Error(
