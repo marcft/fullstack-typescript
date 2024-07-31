@@ -18,17 +18,16 @@ export const isArgsLengthAtLeast = (minLength: number, args: string[]) => {
   return true;
 };
 
-export const parseToNumbers = (array: string[]): number[] => {
-  const res: number[] = array.reduce((acc: number[], cur, index) => {
-    const number = Number(cur);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const parseToNumbers = (array: any[]): number[] => {
+  const res: number[] = array.map((element, index) => {
+    const number = Number(element);
     if (isNaN(number))
       throw new Error(
-        `Expected number on argument positioned ${index}, got '${cur}'`,
+        `Expected number on argument positioned ${index}, got '${element}'`,
       );
-
-    acc.push(number);
-    return acc;
-  }, []);
+    return number;
+  });
 
   return res;
 };
