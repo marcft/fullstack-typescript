@@ -1,5 +1,3 @@
-import { isArgsLengthExactly, parseToNumbers } from './utils';
-
 const calculateBmi = (height: number, weight: number) => {
   const heightInMeters = height / 100;
   const bmi = weight / (heightInMeters * heightInMeters);
@@ -27,17 +25,4 @@ const calculateBmi = (height: number, weight: number) => {
   return resultText;
 };
 
-try {
-  const args = process.argv;
-  if (isArgsLengthExactly(4, args)) {
-    const relevantArgs = args.slice(2);
-    const [height, weight] = parseToNumbers(relevantArgs);
-    console.log(calculateBmi(height, weight));
-  }
-} catch (error: unknown) {
-  let errorMessage = 'Some error happened.';
-  if (error instanceof Error) {
-    errorMessage += ` Error: ${error.message}`;
-  }
-  console.log(errorMessage);
-}
+export default calculateBmi;

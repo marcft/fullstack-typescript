@@ -1,5 +1,3 @@
-import { isArgsLengthAtLeast, parseToNumbers } from './utils';
-
 interface ExerciseResult {
   periodLength: number;
   trainingDays: number;
@@ -48,17 +46,4 @@ const calculateExercises = (
   };
 };
 
-try {
-  const args = process.argv;
-  const relevantArgs = args.slice(2);
-  if (isArgsLengthAtLeast(4, args)) {
-    const [objective, ...hoursArray] = parseToNumbers(relevantArgs);
-    console.log(calculateExercises(hoursArray, objective));
-  }
-} catch (error: unknown) {
-  let errorMessage = 'Some error happened.';
-  if (error instanceof Error) {
-    errorMessage += ` Error: ${error.message}`;
-  }
-  console.log(errorMessage);
-}
+export default calculateExercises;
