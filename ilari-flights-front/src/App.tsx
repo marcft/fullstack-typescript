@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+
+import { DiaryEntry, NonSensitiveDiaryEntry } from './types';
+import NewDiaryForm from './NewDiaryForm';
 import { getAllDiaries } from './services/diaryService';
-import { NonSensitiveDiaryEntry } from './types';
 
 const App = () => {
   const [diaries, setDiaries] = useState<NonSensitiveDiaryEntry[]>([]);
@@ -11,10 +13,15 @@ const App = () => {
     });
   }, []);
 
+  const addOneDiary = (diary: DiaryEntry) => {
+    setDiaries(diaries.concat(diary));
+  };
+
   return (
     <>
-      <h2>Diary entries</h2>
+      <NewDiaryForm addToDiariesList={addOneDiary} />
 
+      <h2>Diary entries</h2>
       {diaries.map((diary) => {
         return (
           <div key={diary.id}>
