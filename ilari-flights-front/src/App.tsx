@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { DiaryEntry, NonSensitiveDiaryEntry } from './types';
-import NewDiaryForm from './NewDiaryForm';
+import NewDiaryForm from './components/NewDiaryForm';
 import { getAllDiaries } from './services/diaryService';
 
 const App = () => {

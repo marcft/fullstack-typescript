@@ -9,6 +9,14 @@ export const getAllDiaries = async () => {
 };
 
 export const createDiary = async (object: NewDiaryEntry) => {
-  const response = await axios.post<DiaryEntry>(baseUrl, object);
-  return response.data;
+  try {
+    const response = await axios.post<DiaryEntry>(baseUrl, object);
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data);
+    } else {
+      throw new Error('Something went wrong.');
+    }
+  }
 };

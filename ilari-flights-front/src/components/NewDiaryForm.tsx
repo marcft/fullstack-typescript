@@ -1,7 +1,8 @@
 import { SyntheticEvent, useState } from 'react';
 
-import { DiaryEntry } from './types';
-import { createDiary } from './services/diaryService';
+import { DiaryEntry } from '../types';
+import { createDiary } from '../services/diaryService';
+import ErrorMessage from './ErrorMessage';
 
 type AddDiaryFunction = (diary: DiaryEntry) => void;
 const NewDiaryForm = ({
@@ -14,6 +15,8 @@ const NewDiaryForm = ({
   const [weather, setWeather] = useState('');
   const [comment, setComment] = useState('');
 
+  const [errorMessage, setErrorMessage] = useState<null | string>(null);
+
   const addDiary = async (event: SyntheticEvent) => {
     event.preventDefault();
 
@@ -24,20 +27,29 @@ const NewDiaryForm = ({
       comment,
     };
 
-    const responseDiary = await createDiary(newDiary);
-    if (responseDiary) {
+    try {
+      const responseDiary = await createDiary(newDiary);
+
       setDate('');
       setVisibility('');
       setWeather('');
       setComment('');
 
       addToDiariesList(responseDiary);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      }
     }
   };
 
   return (
     <>
       <h2>Add new entry</h2>
+      <ErrorMessage errorMessage={errorMessage} />
       <form onSubmit={addDiary}>
         <div>
           date{' '}
