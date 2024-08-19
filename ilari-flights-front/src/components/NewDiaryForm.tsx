@@ -1,6 +1,6 @@
-import { SyntheticEvent, useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useState } from 'react';
 
-import { DiaryEntry } from '../types';
+import { DiaryEntry, Visibility, Weather } from '../types';
 import { createDiary } from '../services/diaryService';
 import ErrorMessage from './ErrorMessage';
 
@@ -11,8 +11,8 @@ const NewDiaryForm = ({
   addToDiariesList: AddDiaryFunction;
 }) => {
   const [date, setDate] = useState('');
-  const [visibility, setVisibility] = useState('');
-  const [weather, setWeather] = useState('');
+  const [visibility, setVisibility] = useState<Visibility>(Visibility.Great);
+  const [weather, setWeather] = useState<Weather>(Weather.Sunny);
   const [comment, setComment] = useState('');
 
   const [errorMessage, setErrorMessage] = useState<null | string>(null);
@@ -31,8 +31,8 @@ const NewDiaryForm = ({
       const responseDiary = await createDiary(newDiary);
 
       setDate('');
-      setVisibility('');
-      setWeather('');
+      setVisibility(Visibility.Great);
+      setWeather(Weather.Sunny);
       setComment('');
 
       addToDiariesList(responseDiary);
@@ -46,37 +46,135 @@ const NewDiaryForm = ({
     }
   };
 
+  const inlineBStyle = { display: 'inline-block' };
+
+  const handleVisibilityChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newVisibility = event.target.value as Visibility;
+    setVisibility(newVisibility);
+  };
+
+  const handleWeatherChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newVisibility = event.target.value as Weather;
+    setWeather(newVisibility);
+  };
+
   return (
     <>
       <h2>Add new entry</h2>
       <ErrorMessage errorMessage={errorMessage} />
       <form onSubmit={addDiary}>
+        {/* DATE */}
         <div>
-          date{' '}
+          date:{' '}
           <input
-            type="text"
+            type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
           />
         </div>
+        {/* VISIBILITY */}
         <div>
-          visibility{' '}
-          <input
-            type="text"
-            value={visibility}
-            onChange={(event) => setVisibility(event.target.value)}
-          />
+          visibility:{' '}
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="vis-great"
+              name="visibility"
+              value={Visibility.Great}
+              onChange={handleVisibilityChange}
+              checked={visibility === Visibility.Great}
+            />
+            <label htmlFor="vis-great">Great</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="vis-good"
+              name="visibility"
+              value={Visibility.Good}
+              onChange={handleVisibilityChange}
+            />
+            <label htmlFor="vis-good">Good</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="vis-ok"
+              name="visibility"
+              value={Visibility.Ok}
+              onChange={handleVisibilityChange}
+            />
+            <label htmlFor="vis-ok">Ok</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="vis-poor"
+              name="visibility"
+              value={Visibility.Poor}
+              onChange={handleVisibilityChange}
+            />
+            <label htmlFor="vis-poor">Poor</label>
+          </div>
         </div>
+        {/* WEATHER */}
         <div>
-          weather{' '}
-          <input
-            type="text"
-            value={weather}
-            onChange={(event) => setWeather(event.target.value)}
-          />
+          weather:{' '}
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="wea-sunny"
+              name="weather"
+              value={Weather.Sunny}
+              onChange={handleWeatherChange}
+              checked={weather === Weather.Sunny}
+            />
+            <label htmlFor="wea-sunny">Sunny</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="wea-rainy"
+              name="weather"
+              value={Weather.Rainy}
+              onChange={handleWeatherChange}
+            />
+            <label htmlFor="wea-rainy">Rainy</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="wea-cloudy"
+              name="weather"
+              value={Weather.Cloudy}
+              onChange={handleWeatherChange}
+            />
+            <label htmlFor="wea-cloudy">Cloudy</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="wea-stormy"
+              name="weather"
+              value={Weather.Stormy}
+              onChange={handleWeatherChange}
+            />
+            <label htmlFor="wea-stormy">Stormy</label>
+          </div>
+          <div style={inlineBStyle}>
+            <input
+              type="radio"
+              id="wea-windy"
+              name="weather"
+              value={Weather.Windy}
+              onChange={handleWeatherChange}
+            />
+            <label htmlFor="wea-windy">Windy</label>
+          </div>
         </div>
+        {/* COMMENT */}
         <div>
-          comment{' '}
+          comment:{' '}
           <input
             type="text"
             value={comment}
