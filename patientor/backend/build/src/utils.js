@@ -35,10 +35,20 @@ const isArray = (param) => {
     return Array.isArray(param);
 };
 const isEntry = (param) => {
-    if (!param || typeof param !== 'object') {
+    if (!param || typeof param !== 'object' || !('type' in param)) {
         return false;
     }
-    return true;
+    const entry = param;
+    switch (entry.type) {
+        case 'HealthCheck':
+        case 'OccupationalHealthcare':
+        case 'Hospital':
+            return true;
+        default:
+            // TypeScript will warn us if there's a new type that is not handled
+            ((_unreachable) => { })(entry);
+            return false;
+    }
 };
 const parseEntries = (entries) => {
     if (!isArray(entries)) {
