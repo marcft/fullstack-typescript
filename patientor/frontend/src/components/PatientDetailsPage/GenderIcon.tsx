@@ -9,11 +9,9 @@ const GenderIcon = ({ gender }: Props) => {
   switch (gender) {
     case Gender.Female:
       return <Female />;
-      break;
 
     case Gender.Male:
       return <Male />;
-      break;
 
     case Gender.Other:
       return <Transgender />;
