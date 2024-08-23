@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Typography } from '@mui/material';
-import { Female, Male, Transgender } from '@mui/icons-material';
 
-import { Gender, Patient } from '../../types';
+import { Patient } from '../../types';
 import patientsService from '../../services/patients';
+import GenderIcon from './GenderIcon';
+import PatientEntries from './PatientEntries';
 
 const PatientDetailsPage = () => {
   const id = useParams().id;
   const [patient, setPatient] = useState<Patient>();
 
-  if (!id) throw new Error(`No patient with id: ${id}`);
+  if (!id) throw new Error('Specify id');
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -24,34 +25,16 @@ const PatientDetailsPage = () => {
     return <Typography variant="body1">Loading...</Typography>;
   }
 
-  let genderIcon: JSX.Element;
-  switch (patient.gender) {
-    case Gender.Female:
-      genderIcon = <Female />;
-      break;
-
-    case Gender.Male:
-      genderIcon = <Male />;
-      break;
-
-    case Gender.Other:
-      genderIcon = <Transgender />;
-      break;
-
-    default:
-      ((value: never): never => {
-        throw new Error(`Unhandled gender: ${JSON.stringify(value)}`);
-      })(patient.gender);
-  }
-
   return (
     <>
       <Typography variant="h4" style={{ margin: '0.5em 0' }}>
-        {patient.name} {genderIcon}
+        {patient.name} <GenderIcon gender={patient.gender} />
       </Typography>
 
       <Typography variant="body1">ssn: {patient.ssn}</Typography>
       <Typography variant="body1">occupation: {patient.occupation}</Typography>
+
+      {patient.entries && <PatientEntries entries={patient.entries} />}
     </>
   );
 };
