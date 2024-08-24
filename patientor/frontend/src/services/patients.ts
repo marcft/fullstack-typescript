@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Patient, PatientFormValues } from '../types';
+import { Entry, EntryFormValues, Patient, PatientFormValues } from '../types';
 
 import { apiBaseUrl } from '../constants';
 
@@ -21,8 +21,31 @@ const create = async (object: PatientFormValues) => {
   return data;
 };
 
+const addEntryToPatientWithId = async (entry: EntryFormValues, id: string) => {
+  try {
+    const { data } = await axios.post<Entry>(
+      `${apiBaseUrl}/patients/${id}/entries`,
+      entry,
+    );
+    return data;
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e)) {
+      if (e?.response?.data && typeof e?.response?.data === 'string') {
+        const message = e.response.data.replace(
+          'Something went wrong. Error: ',
+          '',
+        );
+        throw new Error(message);
+      }
+      throw new Error('Unrecognized axios error');
+    }
+    throw new Error('Unknown error');
+  }
+};
+
 export default {
   getAll,
   getById,
   create,
+  addEntryToPatientWithId,
 };
