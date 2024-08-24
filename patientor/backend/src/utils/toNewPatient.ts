@@ -1,4 +1,5 @@
-import { Gender, NewPatient, Entry } from './types';
+import { Gender, NewPatient, Entry } from '../types';
+import toNewEntry from './toNewEntry';
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -36,38 +37,30 @@ const parseGender = (gender: unknown) => {
   return gender;
 };
 
-const isArray = (param: unknown): param is [] => {
+const isArray = (param: unknown): param is Array<unknown> => {
   return Array.isArray(param);
-};
-
-const isEntry = (param: unknown): param is Entry => {
-  if (!param || typeof param !== 'object' || !('type' in param)) {
-    return false;
-  }
-
-  const entry = param as Entry;
-  switch (entry.type) {
-    case 'HealthCheck':
-    case 'OccupationalHealthcare':
-    case 'Hospital':
-      return true;
-    default:
-      // TypeScript will warn us if there's a new type that is not handled
-      ((_unreachable: never) => {})(entry);
-      return false;
-  }
 };
 
 const parseEntries = (entries: unknown) => {
   if (!isArray(entries)) {
     throw new Error('Incorrect or missing entries');
   }
+
+  const checkedEntries: Entry[] = [];
   for (const entry of entries) {
-    if (!isEntry(entry)) {
-      throw new Error('Incorrect entries');
+    if (!entry || typeof entry !== 'object') {
+      throw new Error('Incorrect or missing entry');
     }
+    if (!('id' in entry) || !entry.id || typeof entry.id !== 'string') {
+      throw new Error(`Entry ${JSON.stringify(entry)} is missing "id"`);
+    }
+    const checkedEntry = toNewEntry(entry) as Entry;
+    checkedEntry.id = entry.id;
+
+    checkedEntries.push(checkedEntry);
   }
-  return entries;
+
+  return checkedEntries;
 };
 
 const toNewPatient = (object: unknown): NewPatient => {
