@@ -1,58 +1,37 @@
 import { useState, SyntheticEvent } from 'react';
 
-import {
-  TextField,
-  InputLabel,
-  MenuItem,
-  Select,
-  Grid,
-  Button,
-  SelectChangeEvent,
-} from '@mui/material';
+import { TextField, Grid, Button } from '@mui/material';
 
 import { EntryFormValues, HealthCheckRating } from '../../types';
+import {
+  HealthCheckEntrySpecificCamps,
+  HospitalEntrySpecificCamps,
+  OccupationalHealthcareEntrySpecificCamps,
+} from './EntrySpecificFormCamps';
 
 interface Props {
   onCancel: () => void;
   onSubmit: (values: EntryFormValues) => void;
+  type: EntryFormValues['type'];
 }
 
-interface HealthCheckRatingOptions {
-  value: HealthCheckRating;
-  label: string;
-}
-
-const healthCheckRatingOptions: HealthCheckRatingOptions[] = Object.values(
-  HealthCheckRating,
-)
-  .filter((value): value is HealthCheckRating => typeof value === 'number')
-  .map((value) => ({
-    value: value,
-    label: HealthCheckRating[value],
-  }));
-
-const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
+const AddEntryForm = ({ onCancel, onSubmit, type }: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
   const [diagnosisCodes, setDiagnosisCodes] = useState('');
+
+  // HealthCheckEntry
   const [healthCheckRating, setHealthCheckRating] = useState<HealthCheckRating>(
     HealthCheckRating.Healthy,
   );
 
-  const onHealthCheckRatingChange = (event: SelectChangeEvent<string>) => {
-    event.preventDefault();
-    if (typeof event.target.value === 'number') {
-      const value = event.target.value;
-      const healthCheckRating = Object.values(HealthCheckRating)
-        .filter((hcr): hcr is HealthCheckRating => typeof hcr === 'number')
-        .find((hcr) => hcr === value);
+  // OccupationalHealthcareEntry
+  const [employerName, setEmployerName] = useState('');
+  const [sickLeave, setSickLeave] = useState({ startDate: '', endDate: '' });
 
-      if (typeof healthCheckRating === 'number') {
-        setHealthCheckRating(healthCheckRating);
-      }
-    }
-  };
+  // HospitalEntry
+  const [discharge, setDischarge] = useState({ date: '', criteria: '' });
 
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -62,14 +41,78 @@ const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
       ? diagnosisCodes.split(',').map((dc) => dc.trim())
       : [];
 
-    onSubmit({
-      type: 'HealthCheck',
+    const baseEntry = {
       description,
       date,
       specialist,
       diagnosisCodes: diagnosisCodesArray,
-      healthCheckRating,
-    });
+    };
+
+    if (type === 'HealthCheck') {
+      onSubmit({
+        ...baseEntry,
+        type: 'HealthCheck',
+        healthCheckRating,
+      });
+    } else if (type === 'OccupationalHealthcare') {
+      // If sickLeave entries are empty we don't submit it (it's supposed to be  opptional)
+      const occupationalBaseEntry = { ...baseEntry, employerName };
+
+      if (!sickLeave.startDate && !sickLeave.endDate) {
+        onSubmit({ ...occupationalBaseEntry, type: 'OccupationalHealthcare' });
+      } else {
+        onSubmit({
+          ...occupationalBaseEntry,
+          type: 'OccupationalHealthcare',
+          sickLeave,
+        });
+      }
+    } else if (type === 'Hospital') {
+      onSubmit({
+        ...baseEntry,
+        type: 'Hospital',
+        discharge,
+      });
+    } else {
+      ((value: never) => {
+        throw new Error(`Unhandled union type: "${value}"`);
+      })(type);
+    }
+  };
+
+  const specificFormCamps = (type: EntryFormValues['type']) => {
+    switch (type) {
+      case 'HealthCheck':
+        return (
+          <HealthCheckEntrySpecificCamps
+            healthCheckRating={healthCheckRating}
+            setHealthCheckRating={setHealthCheckRating}
+          />
+        );
+
+      case 'OccupationalHealthcare':
+        return (
+          <OccupationalHealthcareEntrySpecificCamps
+            employerName={employerName}
+            setEmployerName={setEmployerName}
+            sickLeave={sickLeave}
+            setSickLeave={setSickLeave}
+          />
+        );
+
+      case 'Hospital':
+        return (
+          <HospitalEntrySpecificCamps
+            discharge={discharge}
+            setDischarge={setDischarge}
+          />
+        );
+
+      default:
+        ((value: never) => {
+          throw new Error(`Unhandled union type: "${value}"`);
+        })(type);
+    }
   };
 
   return (
@@ -102,19 +145,7 @@ const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
           onChange={({ target }) => setDiagnosisCodes(target.value)}
         />
 
-        <InputLabel style={{ marginTop: 20 }}>Health Check Rating</InputLabel>
-        <Select
-          label="HealthCheckRating"
-          fullWidth
-          value={healthCheckRating.toString()}
-          onChange={onHealthCheckRatingChange}
-        >
-          {healthCheckRatingOptions.map((option) => (
-            <MenuItem key={option.label} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
+        {specificFormCamps(type)}
 
         <Grid>
           <Grid item>

@@ -5,6 +5,10 @@ import {
   DialogContent,
   Divider,
   Alert,
+  InputLabel,
+  Select,
+  SelectChangeEvent,
+  MenuItem,
 } from '@mui/material';
 
 import { Entry, EntryFormValues } from '../../types';
@@ -18,6 +22,12 @@ interface Props {
   patientId: string;
 }
 
+const entryTypesArray: Array<Entry['type']> = [
+  'HealthCheck',
+  'OccupationalHealthcare',
+  'Hospital',
+];
+
 const AddPatientModal = ({
   modalOpen,
   closeModal,
@@ -25,11 +35,10 @@ const AddPatientModal = ({
   patientId,
 }: Props) => {
   const [error, setError] = useState<string>();
+  const [entryType, setEntryType] = useState<Entry['type']>('HealthCheck');
 
   const submitNewEntry = async (values: EntryFormValues) => {
     try {
-      console.log(values);
-
       const entry = await patientService.addEntryToPatientWithId(
         values,
         patientId,
@@ -45,6 +54,23 @@ const AddPatientModal = ({
     }
   };
 
+  const onHealthCheckRatingChange = (event: SelectChangeEvent<string>) => {
+    event.preventDefault();
+    if (typeof event.target.value === 'string') {
+      const value = event.target.value as Entry['type'];
+      if (
+        value === 'HealthCheck' ||
+        value === 'OccupationalHealthcare' ||
+        value === 'Hospital'
+      ) {
+        setEntryType(value);
+      } else {
+        // Typescript will warn us if there is an unhandled type
+        ((_unhandled: never) => {})(value);
+      }
+    }
+  };
+
   const onClose = () => {
     closeModal();
     setError(undefined);
@@ -56,7 +82,25 @@ const AddPatientModal = ({
       <Divider />
       <DialogContent>
         {error && <Alert severity="error">{error}</Alert>}
-        <AddEntryForm onSubmit={submitNewEntry} onCancel={onClose} />
+        <InputLabel>Entry Type</InputLabel>
+        <Select
+          style={{ marginBottom: 20 }}
+          label="EntryType"
+          fullWidth
+          value={entryType}
+          onChange={onHealthCheckRatingChange}
+        >
+          {entryTypesArray.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </Select>
+        <AddEntryForm
+          onSubmit={submitNewEntry}
+          onCancel={onClose}
+          type={entryType}
+        />
       </DialogContent>
     </Dialog>
   );
