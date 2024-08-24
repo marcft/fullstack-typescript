@@ -156,7 +156,7 @@ const toNewOccupationalHealthcareEntry = (object: unknown): NewEntry => {
       employerName: parseString(object.employerName),
     };
 
-    if ('sickLeave' in object) {
+    if ('sickLeave' in object && object.sickLeave) {
       return {
         ...entry,
         type: 'OccupationalHealthcare',
