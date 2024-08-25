@@ -121,7 +121,7 @@ const toNewOccupationalHealthcareEntry = (object) => {
     }
     if ('employerName' in object) {
         const entry = Object.assign(Object.assign({}, baseEntry), { employerName: parseString(object.employerName) });
-        if ('sickLeave' in object) {
+        if ('sickLeave' in object && object.sickLeave) {
             return Object.assign(Object.assign({}, entry), { type: 'OccupationalHealthcare', sickLeave: parseSickLeave(object.sickLeave) });
         }
         return Object.assign(Object.assign({}, entry), { type: 'OccupationalHealthcare' });
