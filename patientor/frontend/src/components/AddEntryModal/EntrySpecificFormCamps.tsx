@@ -47,7 +47,7 @@ const HealthCheckEntrySpecificCamps = ({
 
   return (
     <>
-      <InputLabel style={{ marginTop: 20 }}>Health Check Rating</InputLabel>
+      <InputLabel style={{ marginTop: 10 }}>Health Check Rating</InputLabel>
       <Select
         label="HealthCheckRating"
         fullWidth
@@ -92,12 +92,15 @@ const OccupationalHealthcareEntrySpecificCamps = ({
       value={employerName}
       onChange={({ target }) => setEmployerName(target.value)}
     />
-    <InputLabel style={{ marginTop: 20 }}>Sick Leave</InputLabel>
+    <InputLabel style={{ marginTop: 10 }}>Sick Leave</InputLabel>
     <TextField
       style={{ marginLeft: 10 }}
       label="Start Date"
-      placeholder="YYYY-MM-DD"
+      type="date"
       fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
       value={sickLeave.startDate}
       onChange={({ target }) =>
         setSickLeave({ ...sickLeave, startDate: target.value })
@@ -106,8 +109,11 @@ const OccupationalHealthcareEntrySpecificCamps = ({
     <TextField
       style={{ marginLeft: 10 }}
       label="End Date"
-      placeholder="YYYY-MM-DD"
+      type="date"
       fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
       value={sickLeave.endDate}
       onChange={({ target }) =>
         setSickLeave({ ...sickLeave, endDate: target.value })
@@ -134,12 +140,15 @@ const HospitalEntrySpecificCamps = ({
   setDischarge,
 }: HospitalEntryProps) => (
   <>
-    <InputLabel style={{ marginTop: 20 }}>Discharge</InputLabel>
+    <InputLabel style={{ marginTop: 10 }}>Discharge</InputLabel>
     <TextField
       style={{ marginLeft: 10 }}
       label="Date"
-      placeholder="YYYY-MM-DD"
+      type="date"
       fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
       value={discharge.date}
       onChange={({ target }) =>
         setDischarge({ ...discharge, date: target.value })

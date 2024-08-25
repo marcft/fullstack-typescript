@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -11,9 +11,10 @@ import {
   MenuItem,
 } from '@mui/material';
 
-import { Entry, EntryFormValues } from '../../types';
+import { Diagnosis, Entry, EntryFormValues } from '../../types';
 import AddEntryForm from './AddEntryForm';
 import patientService from '../../services/patients';
+import diagnosesService from '../../services/diagnoses';
 
 interface Props {
   modalOpen: boolean;
@@ -36,6 +37,16 @@ const AddPatientModal = ({
 }: Props) => {
   const [error, setError] = useState<string>();
   const [entryType, setEntryType] = useState<Entry['type']>('HealthCheck');
+
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      const patient = await diagnosesService.getAll();
+      setDiagnoses(patient);
+    };
+    void fetchPatient();
+  }, []);
 
   const submitNewEntry = async (values: EntryFormValues) => {
     try {
@@ -100,6 +111,7 @@ const AddPatientModal = ({
           onSubmit={submitNewEntry}
           onCancel={onClose}
           type={entryType}
+          diagnosisCodesList={diagnoses.map((d) => d.code)}
         />
       </DialogContent>
     </Dialog>

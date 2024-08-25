@@ -1,8 +1,16 @@
 import { useState, SyntheticEvent } from 'react';
 
-import { TextField, Grid, Button } from '@mui/material';
+import {
+  TextField,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  InputLabel,
+} from '@mui/material';
 
-import { EntryFormValues, HealthCheckRating } from '../../types';
+import { Diagnosis, EntryFormValues, HealthCheckRating } from '../../types';
 import {
   HealthCheckEntrySpecificCamps,
   HospitalEntrySpecificCamps,
@@ -13,13 +21,19 @@ interface Props {
   onCancel: () => void;
   onSubmit: (values: EntryFormValues) => void;
   type: EntryFormValues['type'];
+  diagnosisCodesList: Array<Diagnosis['code']>;
 }
 
-const AddEntryForm = ({ onCancel, onSubmit, type }: Props) => {
+const AddEntryForm = ({
+  onCancel,
+  onSubmit,
+  type,
+  diagnosisCodesList,
+}: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
-  const [diagnosisCodes, setDiagnosisCodes] = useState('');
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   // HealthCheckEntry
   const [healthCheckRating, setHealthCheckRating] = useState<HealthCheckRating>(
@@ -33,19 +47,24 @@ const AddEntryForm = ({ onCancel, onSubmit, type }: Props) => {
   // HospitalEntry
   const [discharge, setDischarge] = useState({ date: '', criteria: '' });
 
+  const onDiagnosisCodesChange = (event: SelectChangeEvent<string[]>) => {
+    let value = event.target.value;
+    if (typeof value === 'string') {
+      value = value.split(',').map((dc) => dc.trim());
+    }
+    setDiagnosisCodes(value);
+
+    console.log({ diagnosisCodes, value });
+  };
+
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault();
-
-    // Checking diagnosisCodes to make sure it isn't = ''
-    const diagnosisCodesArray = diagnosisCodes
-      ? diagnosisCodes.split(',').map((dc) => dc.trim())
-      : [];
 
     const baseEntry = {
       description,
       date,
       specialist,
-      diagnosisCodes: diagnosisCodesArray,
+      diagnosisCodes,
     };
 
     if (type === 'HealthCheck') {
@@ -126,8 +145,11 @@ const AddEntryForm = ({ onCancel, onSubmit, type }: Props) => {
         />
         <TextField
           label="Date"
-          placeholder="YYYY-MM-DD"
+          type="date"
           fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
           value={date}
           onChange={({ target }) => setDate(target.value)}
         />
@@ -137,13 +159,19 @@ const AddEntryForm = ({ onCancel, onSubmit, type }: Props) => {
           value={specialist}
           onChange={({ target }) => setSpecialist(target.value)}
         />
-        <TextField
-          label="Diagnosis codes"
-          placeholder="Values must be comma separated"
+        <InputLabel>Diagnosis Codes</InputLabel>
+        <Select
+          multiple
           fullWidth
           value={diagnosisCodes}
-          onChange={({ target }) => setDiagnosisCodes(target.value)}
-        />
+          onChange={onDiagnosisCodesChange}
+        >
+          {diagnosisCodesList.map((code) => (
+            <MenuItem key={code} value={code}>
+              {code}
+            </MenuItem>
+          ))}
+        </Select>
 
         {specificFormCamps(type)}
 
